@@ -1,11 +1,16 @@
 use std::borrow::{Borrow, BorrowMut};
-use std::cell::Cell;
+use std::cell::{Cell, Ref, RefCell};
+use std::fmt::{Display, Formatter};
+use std::ops::Deref;
+use std::rc::Rc;
 
+#[derive(Clone, Debug)]
 pub struct Checkoffs {
-    checkoffs: Cell<Vec<TruckCheck>>,
+    pub checkoffs: Vec<RefCell<Option<TruckCheck>>>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug)]
 pub struct TruckCheck {
     name: String,
     level: String,
@@ -16,21 +21,31 @@ pub struct TruckCheck {
 impl Checkoffs {
     pub fn new(checks: Option<Vec<TruckCheck>>) -> Self {
 
-        let new_checks = match checks{
-            Some(c) => c,
-            _ => Vec::new()
+        let mut v = Vec::new();
+        match checks{
+            Some(c) => {
+                for chk in c {
+                    v.push(RefCell::new(Some(chk)))
+                }
+            },
+            _ => {
+                v.push(RefCell::new(None))
+            }
         };
         Checkoffs {
-            checkoffs: Cell::new(new_checks)
+            checkoffs: v
         }
     }
 
     pub fn add(&mut self, check: TruckCheck){
-        self.checkoffs.get_mut().push(check);
+        let new_tc: RefCell<Option<TruckCheck>> = RefCell::new(Some(check));
+        self.checkoffs.push(new_tc)
     }
-    pub fn remove(&mut self, check: TruckCheck){
-        let checkoffs = self.checkoffs.get_mut();
-        checkoffs.retain(|t| *t != check);
+}
+
+impl Display for TruckCheck{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
     }
 }
 
