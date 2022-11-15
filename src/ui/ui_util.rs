@@ -102,6 +102,7 @@ pub(crate) fn draw_truck_line(
             };
         });
     });
+    ui.end_row();
 }
 
 

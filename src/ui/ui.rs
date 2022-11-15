@@ -11,7 +11,8 @@ use crate::ui::ui_util::{draw_truck_line, edit_window};
 #[derive(Debug)]
 pub struct CheckoffApp{
     checkoffs: Rc<Checkoffs>,
-    state: State
+    state: State,
+    specify_date: bool,
 }
 
 #[derive(Debug, Default)]
@@ -24,7 +25,8 @@ impl Default for CheckoffApp {
     fn default() -> Self {
         Self {
             checkoffs: Rc::new(Checkoffs::new(None)),
-            state: State::Normal
+            state: State::Normal,
+            specify_date: false,
         }
     }
 }
@@ -38,17 +40,13 @@ impl CheckoffApp{
             None => CheckoffApp::default()
         }
     }
-    fn change_state(&mut self, new_state: State) {
-        self.state = new_state
-    }
 }
 
 impl eframe::App for CheckoffApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self {state: state, checkoffs:chks } = self;
+        let Self {state, checkoffs:chks, specify_date } = self;
 
         println!("Start of update actual {:?}", state );
-
 
         ui_util::custom_window_frame(ctx, frame, "Checkoff Generator", |ui|{
 
@@ -66,20 +64,10 @@ impl eframe::App for CheckoffApp {
                     None => {}
                 }
             }
-            ui.button("Add New");
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 0.0;
-                    ui.label("powered by ");
-                    ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                    ui.label(" and ");
-                    ui.hyperlink_to(
-                        "eframe",
-                        "https://github.com/emilk/egui/tree/master/crates/eframe",
-                    );
-                    ui.label(".");
-                });
-            });
+            if ui.button("Add New").clicked() {
+                todo!()
+            };
+            ui.add(egui::Separator::default());
         });
 
         match state {
