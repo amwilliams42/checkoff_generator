@@ -11,7 +11,7 @@ pub struct Checkoffs {
 
 #[derive(Clone, Debug)]
 pub struct TruckCheck {
-    name: String,
+    pub name: String,
     pub(crate) level: TruckLevel,
 }
 

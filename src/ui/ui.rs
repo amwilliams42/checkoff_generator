@@ -6,7 +6,7 @@ use eframe::egui;
 use egui::{Color32, RichText};
 use crate::checkoffs::{Checkoffs, TruckCheck};
 use crate::checkoffs::checkoffs::TruckLevel;
-use crate::ui::ui_util::edit_window;
+use crate::ui::ui_util::{draw_truck_line, edit_window};
 
 #[derive(Debug)]
 pub struct CheckoffApp{
@@ -15,7 +15,7 @@ pub struct CheckoffApp{
 }
 
 #[derive(Debug, Default)]
-enum State{
+pub enum State{
     #[default] Normal,
     Editing(TruckCheck)
 }
@@ -60,25 +60,8 @@ impl eframe::App for CheckoffApp {
             for ch in chks.checkoffs.iter(){
                 match ch.borrow_mut().as_mut() {
                     Some(c) => {
+                        draw_truck_line(c, state, ui);
                         println!("{:?}", c);
-                        ui.push_id(format!("{:?}", c), |ui|{
-                            ui.horizontal(|ui|{
-                                ui.label(format!("{}", c));
-                                egui::ComboBox::from_label("Truck Level")
-                                    .selected_text(format!("{:?}", c.level))
-                                    .show_ui(ui, |ui| {
-                                        ui.selectable_value(&mut c.level, TruckLevel::ALS, "ALS");
-                                        ui.selectable_value(&mut c.level, TruckLevel::BLS, "BLS");
-                                        ui.selectable_value(&mut c.level, TruckLevel::Vent, "Vent");
-                                    });
-                                if ui.button("Edit").clicked() {
-                                    *state = State::Editing(c.clone())
-                                };
-                                if ui.button(RichText::new("delete").color(Color32::RED)).clicked() {
-                                    // …
-                                };
-                            });
-                        });
                     },
                     None => {}
                 }

@@ -1,6 +1,9 @@
+use eframe::epaint::Color32;
 use eframe::Frame;
-use crate::checkoffs::TruckCheck;
-use crate::ui::ui_util;
+use egui::RichText;
+use crate::checkoffs::checkoffs::TruckLevel;
+use crate::checkoffs::{Checkoffs, TruckCheck};
+use crate::ui::{CheckoffApp, ui_util, State};
 
 pub(crate) fn custom_window_frame(
     ctx: &egui::Context,
@@ -78,6 +81,28 @@ pub(crate) fn custom_window_frame(
             add_contents(&mut content_ui);
         });
 }
+
+pub(crate) fn draw_truck_line(
+    c: &mut TruckCheck,
+    ui: &mut egui::Ui,
+) {
+    ui.push_id(format!("{:?}", c), |ui|{
+        ui.horizontal(|ui|{
+            ui.add(egui::TextEdit::singleline(&mut c.name));
+            egui::ComboBox::from_id_source(&c.name)
+                .selected_text(format!("{:?}", c.level))
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(&mut c.level, TruckLevel::ALS, "ALS");
+                    ui.selectable_value(&mut c.level, TruckLevel::BLS, "BLS");
+                    ui.selectable_value(&mut c.level, TruckLevel::Vent, "Vent");
+                });
+            if ui.button(RichText::new("Delete").color(Color32::RED)).clicked() {
+                // …
+            };
+        });
+    });
+}
+
 
 pub(crate) fn edit_window(
     ctx: &egui::Context,
