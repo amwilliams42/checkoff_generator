@@ -12,7 +12,8 @@ pub struct Checkoffs {
 #[derive(Clone, Debug)]
 pub struct TruckCheck {
     pub name: String,
-    pub(crate) level: TruckLevel,
+    pub level: TruckLevel,
+    pub print: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -58,15 +59,7 @@ impl TruckCheck{
         TruckCheck{
             name,
             level,
-        }
-    }
-
-    pub fn update(&mut self, name: Option<String>, level: Option<TruckLevel>) {
-        match (name,level) {
-            (Some(n), Some(l)) => {self.name = n; self.level=l},
-            (Some(n), None) => {self.name = n;},
-            (None, Some(l)) => {self.level=l},
-            (None, None) => {}
+            print: false,
         }
     }
 }

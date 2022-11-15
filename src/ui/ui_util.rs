@@ -96,6 +96,7 @@ pub(crate) fn draw_truck_line(
                     ui.selectable_value(&mut c.level, TruckLevel::BLS, "BLS");
                     ui.selectable_value(&mut c.level, TruckLevel::Vent, "Vent");
                 });
+            ui.add(egui::Checkbox::new(&mut c.print, "Print"));
             if ui.button(RichText::new("Delete").color(Color32::RED)).clicked() {
                 // …
             };

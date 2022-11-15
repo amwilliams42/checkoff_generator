@@ -60,7 +60,7 @@ impl eframe::App for CheckoffApp {
             for ch in chks.checkoffs.iter(){
                 match ch.borrow_mut().as_mut() {
                     Some(c) => {
-                        draw_truck_line(c, state, ui);
+                        draw_truck_line(c, ui);
                         println!("{:?}", c);
                     },
                     None => {}
