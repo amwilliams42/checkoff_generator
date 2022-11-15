@@ -1,21 +1,30 @@
-use std::borrow::Borrow;
+use std::borrow::{Borrow, BorrowMut};
 use std::cell::{Cell, Ref, RefCell};
 use std::rc::Rc;
 use super::ui_util;
 use eframe::egui;
-use crate::checkoffs::Checkoffs;
+use egui::{Color32, RichText};
+use crate::checkoffs::{Checkoffs, TruckCheck};
+use crate::checkoffs::checkoffs::TruckLevel;
+use crate::ui::ui_util::edit_window;
 
 #[derive(Debug)]
 pub struct CheckoffApp{
-    test_label: String,
     checkoffs: Rc<Checkoffs>,
+    state: State
+}
+
+#[derive(Debug, Default)]
+enum State{
+    #[default] Normal,
+    Editing(TruckCheck)
 }
 
 impl Default for CheckoffApp {
     fn default() -> Self {
         Self {
-            test_label: "Testing 123".to_owned(),
-            checkoffs: Rc::new(Checkoffs::new(None))
+            checkoffs: Rc::new(Checkoffs::new(None)),
+            state: State::Normal
         }
     }
 }
@@ -29,15 +38,17 @@ impl CheckoffApp{
             None => CheckoffApp::default()
         }
     }
+    fn change_state(&mut self, new_state: State) {
+        self.state = new_state
+    }
 }
 
 impl eframe::App for CheckoffApp {
-    fn clear_color(&self, _visuals: &egui::Visuals) -> egui::Rgba{
-        egui::Rgba::TRANSPARENT
-    }
-
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self {test_label: _, checkoffs:chks } = self;
+        let Self {state: state, checkoffs:chks } = self;
+
+        println!("Start of update actual {:?}", state );
+
 
         ui_util::custom_window_frame(ctx, frame, "Checkoff Generator", |ui|{
 
@@ -46,13 +57,30 @@ impl eframe::App for CheckoffApp {
                 ui.label("asdf")
             });
 
-            println!("{:?}", chks);
             for ch in chks.checkoffs.iter(){
-                match &*ch.borrow() {
+                match ch.borrow_mut().as_mut() {
                     Some(c) => {
-                        ui.label("truck");
+                        println!("{:?}", c);
+                        ui.push_id(format!("{:?}", c), |ui|{
+                            ui.horizontal(|ui|{
+                                ui.label(format!("{}", c));
+                                egui::ComboBox::from_label("Truck Level")
+                                    .selected_text(format!("{:?}", c.level))
+                                    .show_ui(ui, |ui| {
+                                        ui.selectable_value(&mut c.level, TruckLevel::ALS, "ALS");
+                                        ui.selectable_value(&mut c.level, TruckLevel::BLS, "BLS");
+                                        ui.selectable_value(&mut c.level, TruckLevel::Vent, "Vent");
+                                    });
+                                if ui.button("Edit").clicked() {
+                                    *state = State::Editing(c.clone())
+                                };
+                                if ui.button(RichText::new("delete").color(Color32::RED)).clicked() {
+                                    // …
+                                };
+                            });
+                        });
                     },
-                    None => {ui.label("No Truck Checks. Add one!");}
+                    None => {}
                 }
             }
             ui.button("Add New");
@@ -70,5 +98,16 @@ impl eframe::App for CheckoffApp {
                 });
             });
         });
+
+        match state {
+            State::Normal => {},
+            State::Editing(t) => {
+                edit_window(ctx, frame, t);
+            }
+        }
+    }
+
+    fn clear_color(&self, _visuals: &egui::Visuals) -> egui::Rgba{
+        egui::Rgba::TRANSPARENT
     }
 }

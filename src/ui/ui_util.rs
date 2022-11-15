@@ -1,3 +1,6 @@
+use eframe::Frame;
+use crate::checkoffs::TruckCheck;
+use crate::ui::ui_util;
 
 pub(crate) fn custom_window_frame(
     ctx: &egui::Context,
@@ -74,4 +77,27 @@ pub(crate) fn custom_window_frame(
             let mut content_ui = ui.child_ui(content_rect, *ui.layout());
             add_contents(&mut content_ui);
         });
+}
+
+pub(crate) fn edit_window(
+    ctx: &egui::Context,
+    frame: &mut Frame,
+    tcheck: &mut TruckCheck,
+) {
+    let title = stringify!("Editing {}", &tcheck);
+    ui_util::custom_window_frame(ctx, frame, title, |ui|{
+        ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label("powered by ");
+                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+                ui.label(" and ");
+                ui.hyperlink_to(
+                    "eframe",
+                    "https://github.com/emilk/egui/tree/master/crates/eframe",
+                );
+                ui.label(".");
+            });
+        });
+    });
 }

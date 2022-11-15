@@ -9,14 +9,18 @@ pub struct Checkoffs {
     pub checkoffs: Vec<RefCell<Option<TruckCheck>>>,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
 #[derive(Clone, Debug)]
 pub struct TruckCheck {
     name: String,
-    level: String,
+    pub(crate) level: TruckLevel,
 }
 
-
+#[derive(Clone, Debug, PartialEq)]
+pub enum TruckLevel {
+    ALS,
+    BLS,
+    Vent
+}
 
 impl Checkoffs {
     pub fn new(checks: Option<Vec<TruckCheck>>) -> Self {
@@ -50,14 +54,14 @@ impl Display for TruckCheck{
 }
 
 impl TruckCheck{
-    pub fn new(name: String, level:String) -> Self{
+    pub fn new(name: String, level:TruckLevel) -> Self{
         TruckCheck{
             name,
             level,
         }
     }
 
-    pub fn update(&mut self, name: Option<String>, level: Option<String>) {
+    pub fn update(&mut self, name: Option<String>, level: Option<TruckLevel>) {
         match (name,level) {
             (Some(n), Some(l)) => {self.name = n; self.level=l},
             (Some(n), None) => {self.name = n;},

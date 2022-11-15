@@ -1,3 +1,4 @@
+use crate::checkoffs::checkoffs::TruckLevel;
 
 mod ui;
 mod checkoffs;
@@ -12,8 +13,8 @@ pub fn main() {
     };
     let mut truck_checks = checkoffs::Checkoffs::new(None);
 
-    truck_checks.add(checkoffs::TruckCheck::new("M-01".to_owned(), "BLS".to_owned()));
-    truck_checks.add(checkoffs::TruckCheck::new("M-02".to_owned(), "BLS".to_owned()));
+    truck_checks.add(checkoffs::TruckCheck::new("M-01".to_owned(), TruckLevel::BLS));
+    truck_checks.add(checkoffs::TruckCheck::new("M-02".to_owned(), TruckLevel::ALS));
     eframe::run_native(
         "Checkoff Generator",
         opt,
