@@ -1,5 +1,6 @@
 use std::borrow::{Borrow, BorrowMut};
 use std::cell::{Cell, Ref, RefCell};
+use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 use super::ui_util;
 use eframe::egui;
@@ -10,7 +11,7 @@ use crate::ui::ui_util::{draw_truck_line, edit_window};
 
 #[derive(Debug)]
 pub struct CheckoffApp{
-    checkoffs: Rc<Checkoffs>,
+    checkoffs: Checkoffs,
     state: State,
     specify_date: bool,
 }
@@ -24,7 +25,7 @@ pub enum State{
 impl Default for CheckoffApp {
     fn default() -> Self {
         Self {
-            checkoffs: Rc::new(Checkoffs::new(None)),
+            checkoffs: Checkoffs::new(None),
             state: State::Normal,
             specify_date: false,
         }
@@ -34,7 +35,7 @@ impl CheckoffApp{
     pub fn new(_ctx: &eframe::CreationContext<'_>, checkoffs: Option<Checkoffs>) -> Self {
         match checkoffs {
             Some(c) => CheckoffApp{
-                checkoffs: Rc::new(c),
+                checkoffs: c,
                 ..Default::default()
             },
             None => CheckoffApp::default()
@@ -55,10 +56,10 @@ impl eframe::App for CheckoffApp {
                 ui.label("asdf")
             });
 
-            for ch in chks.checkoffs.iter(){
+            for ch in chks.checkoffs.clone().iter(){
                 match ch.borrow_mut().as_mut() {
                     Some(c) => {
-                        draw_truck_line(c, ui);
+                        draw_truck_line(chks ,c, ui);
                         println!("{:?}", c);
                     },
                     None => {}

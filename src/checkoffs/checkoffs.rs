@@ -9,7 +9,7 @@ pub struct Checkoffs {
     pub checkoffs: Vec<RefCell<Option<TruckCheck>>>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TruckCheck {
     pub name: String,
     pub level: TruckLevel,

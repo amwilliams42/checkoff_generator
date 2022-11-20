@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+use std::rc::Rc;
 use eframe::epaint::Color32;
 use eframe::Frame;
 use egui::RichText;
@@ -83,6 +85,7 @@ pub(crate) fn custom_window_frame(
 }
 
 pub(crate) fn draw_truck_line(
+    checks: &mut Checkoffs,
     c: &mut TruckCheck,
     ui: &mut egui::Ui,
 ) {
@@ -98,7 +101,9 @@ pub(crate) fn draw_truck_line(
                 });
             ui.add(egui::Checkbox::new(&mut c.print, "Print"));
             if ui.button(RichText::new("Delete").color(Color32::RED)).clicked() {
-                // …
+                checks.checkoffs = checks.checkoffs.drain(..)
+                    .filter(|ch| ch.take().unwrap() == c.to_owned())
+                    .collect();
             };
         });
     });
