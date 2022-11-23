@@ -47,8 +47,6 @@ impl eframe::App for CheckoffApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         let Self {state, checkoffs:chks, specify_date } = self;
 
-        println!("Start of update actual {:?}", state );
-
         ui_util::custom_window_frame(ctx, frame, "Checkoff Generator", |ui|{
 
             ui.heading("Truck Checkoffs:");
@@ -56,17 +54,26 @@ impl eframe::App for CheckoffApp {
                 ui.label("asdf")
             });
 
-            for ch in chks.checkoffs.clone().iter(){
-                match ch.borrow_mut().as_mut() {
-                    Some(c) => {
-                        draw_truck_line(chks ,c, ui);
-                        println!("{:?}", c);
+            let mut checks_temp = chks.checkoffs.clone();
+            let mut to_delete: Vec<bool> = Vec::new();
+
+            for ch in checks_temp.iter() {
+                match draw_truck_line(chks, ch.borrow_mut().deref_mut(), ui) {
+                    true => {
+                      to_delete.push(true)
                     },
-                    None => {}
-                }
+                    false => {to_delete.push(false)}
+                };
             }
+
+            // Retain from the boolean mask from earlier, onto the temp, then finally update the
+            // actual checkoffs with the temp ones.
+            let mut iter = to_delete.into_iter();
+            checks_temp.retain(|_| !iter.next().unwrap());
+            chks.checkoffs = checks_temp;
+
             if ui.button("Add New").clicked() {
-                todo!()
+                chks.add(TruckCheck::default());
             };
             ui.add(egui::Separator::default());
         });

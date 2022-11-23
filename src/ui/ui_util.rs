@@ -1,4 +1,6 @@
 use std::borrow::BorrowMut;
+use std::cell::RefCell;
+use std::ops::DerefMut;
 use std::rc::Rc;
 use eframe::epaint::Color32;
 use eframe::Frame;
@@ -88,7 +90,8 @@ pub(crate) fn draw_truck_line(
     checks: &mut Checkoffs,
     c: &mut TruckCheck,
     ui: &mut egui::Ui,
-) {
+) -> bool {
+    let mut deleted: bool = false;
     ui.push_id(format!("{:?}", c), |ui|{
         ui.horizontal(|ui|{
             ui.add(egui::TextEdit::singleline(&mut c.name));
@@ -101,13 +104,12 @@ pub(crate) fn draw_truck_line(
                 });
             ui.add(egui::Checkbox::new(&mut c.print, "Print"));
             if ui.button(RichText::new("Delete").color(Color32::RED)).clicked() {
-                checks.checkoffs = checks.checkoffs.drain(..)
-                    .filter(|ch| ch.take().unwrap() == c.to_owned())
-                    .collect();
+                deleted = true
             };
         });
     });
     ui.end_row();
+    deleted
 }
 
 
