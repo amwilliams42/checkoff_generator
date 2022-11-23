@@ -54,9 +54,15 @@ impl eframe::App for CheckoffApp {
                 ui.label("asdf")
             });
 
+
+
             let mut checks_temp = chks.checkoffs.clone();
             let mut to_delete: Vec<bool> = Vec::new();
 
+            // Iterating over the temporary list causes a problem with deleting an entry as it is unsafe
+            // in general to remove an item from a list you are iterating over. So we create a vec
+            // of boolean values to_delete of the one(s) we mark for deletion. This also allows us
+            // to delete multiple at once, though as of yet the UI doesn't allow for that.
             for ch in checks_temp.iter() {
                 match draw_truck_line(chks, ch.borrow_mut().deref_mut(), ui) {
                     true => {
