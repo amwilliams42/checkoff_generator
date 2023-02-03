@@ -1,25 +1,38 @@
 use std::borrow::{Borrow, BorrowMut};
 use std::cell::{Cell, Ref, RefCell};
+use std::io::Error;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
-use super::ui_util;
-use eframe::egui;
+use super::truck_window;
+use eframe::{egui, Storage};
 use egui::{Color32, RichText};
-use crate::checkoffs::{Checkoffs, TruckCheck};
+use crate::checkoffs::{CheckoffForm, Checkoffs, TruckCheck};
 use crate::checkoffs::checkoffs::TruckLevel;
-use crate::ui::ui_util::{draw_truck_line, edit_window};
+use crate::ui::edit_window::edit_window;
+use crate::ui::generate_window::generate_window;
+use crate::ui::truck_window::{draw_truck_line, home_window};
 
 #[derive(Debug)]
 pub struct CheckoffApp{
-    checkoffs: Checkoffs,
-    state: State,
-    specify_date: bool,
+    pub(crate) checkoffs: Checkoffs,
+    pub state: State,
+    pub form: CheckoffForm,
+    pub print_mode: PrintMode,
+    pub start_date: Option<chrono::NaiveDate>,
+    pub end_date: Option<chrono::NaiveDate>
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub enum State{
     #[default] Normal,
-    Editing(TruckCheck)
+    Editing,
+    Generating,
+}
+
+#[derive(Debug, Default, PartialEq)]
+pub enum PrintMode{
+    #[default] OneByOne,
+    AllTogether,
 }
 
 impl Default for CheckoffApp {
@@ -27,72 +40,93 @@ impl Default for CheckoffApp {
         Self {
             checkoffs: Checkoffs::new(None),
             state: State::Normal,
-            specify_date: false,
+            form: CheckoffForm::new(),
+            print_mode: Default::default(),
+            start_date: None,
+            end_date: None
         }
     }
 }
 impl CheckoffApp{
-    pub fn new(_ctx: &eframe::CreationContext<'_>, checkoffs: Option<Checkoffs>) -> Self {
-        match checkoffs {
-            Some(c) => CheckoffApp{
-                checkoffs: c,
-                ..Default::default()
-            },
-            None => CheckoffApp::default()
+    pub fn new(_ctx: &eframe::CreationContext<'_>) -> Self {
+        let form = match CheckoffForm::load() {
+            Ok(f) => f,
+            Err(_) => {CheckoffForm::new()}
+        };
+        let checks = match Checkoffs::load() {
+            Ok(c) => c,
+            Err(_) => Checkoffs::new(None)
+        };
+        CheckoffApp{
+            checkoffs: checks,
+            form,
+            ..Default::default()
         }
     }
 }
 
 impl eframe::App for CheckoffApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self {state, checkoffs:chks, specify_date } = self;
+        use egui::*;
 
-        ui_util::custom_window_frame(ctx, frame, "Checkoff Generator", |ui|{
 
-            ui.heading("Truck Checkoffs:");
-            ui.horizontal(|ui| {
-                ui.label("asdf")
+        TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            // The top panel is often a good place for a menu bar:
+            egui::menu::bar(ui, |ui| {
+                ui.menu_button("File", |ui| {
+                    let (mut trucks, mut edit, mut generate) = (true, true, true);
+
+                    match self.state {
+                        State::Normal => {
+                            trucks = false;
+                        }
+                        State::Editing => {
+                            edit = false;
+                        }
+                        State::Generating => {
+                            generate = false;
+                        }
+                    }
+                    ui.add_enabled_ui(trucks, |ui| {
+                        if ui.button("Trucks").clicked() {
+                            self.state = State::Normal
+                        }
+                    });
+                    ui.add_enabled_ui(edit, |ui| {
+                        if ui.button("Edit Forms").clicked() {
+                            self.state = State::Editing
+                        }
+                    });
+                    ui.add_enabled_ui(generate, |ui| {
+                        if ui.button("Generate Forms").clicked() {
+                            self.state = State::Generating
+                        }
+                    });
+                    if ui.button("Quit").clicked() {
+                        frame.close();
+                    }
+                });
             });
-
-
-
-            let mut checks_temp = chks.checkoffs.clone();
-            let mut to_delete: Vec<bool> = Vec::new();
-
-            // Iterating over the temporary list causes a problem with deleting an entry as it is unsafe
-            // in general to remove an item from a list you are iterating over. So we create a vec
-            // of boolean values to_delete of the one(s) we mark for deletion. This also allows us
-            // to delete multiple at once, though as of yet the UI doesn't allow for that.
-            for ch in checks_temp.iter() {
-                match draw_truck_line(chks, ch.borrow_mut().deref_mut(), ui) {
-                    true => {
-                      to_delete.push(true)
-                    },
-                    false => {to_delete.push(false)}
-                };
-            }
-
-            // Retain from the boolean mask from earlier, onto the temp, then finally update the
-            // actual checkoffs with the temp ones.
-            let mut iter = to_delete.into_iter();
-            checks_temp.retain(|_| !iter.next().unwrap());
-            chks.checkoffs = checks_temp;
-
-            if ui.button("Add New").clicked() {
-                chks.add(TruckCheck::default());
-            };
-            ui.add(egui::Separator::default());
         });
 
-        match state {
-            State::Normal => {},
-            State::Editing(t) => {
-                edit_window(ctx, frame, t);
+        CentralPanel::default().show(ctx, |ui| {
+            match self.state {
+                State::Normal => {
+                    home_window(ui, self);
+                },
+                State::Editing => {
+                    edit_window(ui, self);
+                },
+                State::Generating => {
+                    generate_window(ui, self);
+                }
             }
-        }
+        });
+
     }
 
-    fn clear_color(&self, _visuals: &egui::Visuals) -> egui::Rgba{
-        egui::Rgba::TRANSPARENT
+    fn save(&mut self, _storage: &mut dyn Storage) {
+        self.checkoffs.save().unwrap();
+        self.form.save().unwrap();
     }
 }

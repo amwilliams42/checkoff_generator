@@ -1,4 +1,6 @@
 pub mod ui;
-pub mod ui_util;
+pub mod truck_window;
+mod edit_window;
+mod generate_window;
 
 pub use ui::{CheckoffApp, State};

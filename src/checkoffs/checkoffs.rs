@@ -4,13 +4,15 @@ use std::fmt::{Display, Formatter};
 use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Checkoffs {
     pub checkoffs: Vec<RefCell<TruckCheck>>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct TruckCheck {
     pub name: String,
     pub level: TruckLevel,
@@ -18,11 +20,21 @@ pub struct TruckCheck {
     pub id: usize,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub enum TruckLevel {
     ALS,
     BLS,
     Vent
+}
+
+impl Display for TruckLevel{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self{
+            TruckLevel::ALS => write!(f, "ALS"),
+            TruckLevel::BLS => write!(f, "BLS"),
+            TruckLevel::Vent => write!(f, "VENT"),
+        }
+    }
 }
 
 impl Checkoffs {
@@ -49,10 +61,20 @@ impl Checkoffs {
         self.checkoffs.push(new_tc)
     }
     pub fn remove(&mut self, check: &mut TruckCheck) {
-        println!("Before: {:?}", self.checkoffs );
         self.checkoffs.retain(|ch| ch.borrow().to_owned() != check.to_owned());
-        println!("After: {:?}", self.checkoffs );
+    }
 
+    pub fn save(&self) -> std::io::Result<()> {
+        let out = serde_json::to_string(&self).unwrap();
+        std::fs::write("checkoffs.json", out)
+    }
+    pub fn load() -> Result<Checkoffs, std::io::Error> {
+        let checkoff_form_json = std::fs::read_to_string("checkoffs.json");
+
+        match checkoff_form_json {
+            Ok(c) => Ok(serde_json::from_str::<Checkoffs>(&c).unwrap()),
+            Err(e) => Err(e),
+        }
     }
 }
 
