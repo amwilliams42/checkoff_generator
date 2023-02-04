@@ -35,7 +35,7 @@ fn date_handler(
     app.end_date = Some(*end_date);
 }
 
-pub fn generate_window(ui: &mut egui::Ui,app: &mut CheckoffApp) {
+pub fn generate_window(ctx: &egui::Context, ui: &mut egui::Ui,app: &mut CheckoffApp) {
     ui.spacing_mut().item_spacing.x = 5.0;
     ui.heading("Checkoff Generation Settings");
     ui.separator();
@@ -45,7 +45,6 @@ pub fn generate_window(ui: &mut egui::Ui,app: &mut CheckoffApp) {
         ui.selectable_value(&mut app.print_mode, PrintMode::AllTogether, "All In One File");
         ui.selectable_value(&mut app.print_mode, PrintMode::OneByOne, "One Unit Per File");
     });
-
 
         date_handler(ui, app);
         let mut gen_vis:bool = false;
@@ -60,7 +59,7 @@ pub fn generate_window(ui: &mut egui::Ui,app: &mut CheckoffApp) {
         }
         ui.add_enabled_ui(gen_vis, |ui| {
             if ui.button("Generate Checkoffs").clicked() {
-                generate_checkoffs(app.deref())
+                generate_checkoffs(app)
             }
         });
 

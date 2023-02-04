@@ -1,0 +1,188 @@
+\documentclass[norsk,pt]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{colortbl,tabularx,ifxetex,isodate}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym}
+
+
+\pagestyle{empty}
+
+\setlength{\arrayrulewidth}{1pt}
+%\setlength{\tabcolsep}{1ex}
+
+\newcolumntype{Y}{|>{\hsize=\dimexpr2\hsize + 2\tabcolsep+\arrayrulewidth\relax}X|}
+\newcolumntype{Z}{|>{\hsize=\dimexpr3\hsize+4\tabcolsep+2\arrayrulewidth\relax}X|}
+\newcommand\T{\rule{0pt}{2ex}}
+
+\newcommand{\yesno}{\textsf{Yes}:{  \rule{0.5cm}{0.15mm}} \textsf{No}:{  \rule{0.5cm}{0.15mm}}\T}
+
+\newcommand{\sealnum}{\textsf{Seal \# }:\T}
+
+\newcommand{\chkheader}[1]{\CTRcoloredrow \multicolumn{4}{|c|}{ \textbf{ #1}}\\\hline}
+
+\newcommand{\chkitem}[2]{ {#1}: & \yesno & {#2}:  &\yesno \\\hline
+}
+
+\newcommand{\chkone}[1]{ {#1}: & \yesno &   & \\\hline
+}
+
+
+\newcommand{\chkseal}[1]{ \textbf{Cabinet \thescabnum }: #1 &\sealnum \stepcounter{scabnum} \\\hline
+}
+
+
+\newcounter{scabnum}
+
+
+\def\CTRheaderfont{\scriptsize\sffamily}
+\def\CTRheaderfontBold{\CTRheaderfont\bfseries}
+\def\CTRcoloredrow{\rowcolor[gray]{.9}}
+
+\newcommand\CTRempty[1]{\multicolumn{#1}{X}{}\\}
+\newcommand\BLSCheckoff[3]{
+    \begin{CTR}
+        \CheckTruck{#1}
+        \CheckDate{#2}
+        \CheckLevel{#3}
+     \end{CTR}
+     \newpage
+}
+\newcommand\ALSCheckoff[3]{
+    \begin{CTR}
+        \CheckTruck{#1}
+        \CheckDate{#2}
+        \CheckLevel{#3}
+     \end{CTR}
+     \begin{CTR_ALS}
+     \end{CTR_ALS}
+     \newpage
+}
+\newcommand\VENTCheckoff[3]{
+    \begin{CTR}
+        \CheckTruck{#1}
+        \CheckDate{#2}
+        \CheckLevel{#3}
+     \end{CTR}
+     \begin{CTR_ALS}
+     \end{CTR_ALS}
+     \begin{CTR_VENT}
+     \end{CTR_VENT}
+     \newpage
+}
+\newcommand\CheckTruck[1]{\def\argtruck{#1}}
+\newcommand\CheckDate[1]{\def\argdate{#1}}
+\newcommand\CheckLevel[1]{\def\arglevel{#1}}
+
+\newenvironment{CTR}{}{%
+%   \cleardoublepage
+    \setcounter{scabnum}{0}
+    \stepcounter{scabnum}
+    \begin{center}
+        \begin{tabularx}{\textwidth}{|X|X|X|}
+            \hline
+
+            \CTRcoloredrow
+            \CTRheaderfontBold Truck Number:&\CTRheaderfontBold Date:&\CTRheaderfontBold Service Level:\\
+            \CTRcoloredrow
+            \argtruck&\argdate&\arglevel\\\hline
+        \end{tabularx}
+        \begin{tabularx}{\textwidth}{|X|X|}
+            \hline
+            \CTRheaderfont Crew 1 Printed Name:&\CTRheaderfont Crew 2 Printed Name:\\
+            & \\\hline
+            \CTRheaderfont Crew 1 Signature:&\CTRheaderfont Crew 2 Signature:\\
+            & \\\hline
+
+        \end{tabularx}
+
+        \begin{tabularx}{\textwidth}{|XX|}
+            \hline
+            \CTRcoloredrow \multicolumn{2}{|c|}{ \textbf{Sealed Cabinets}}\\
+            \hline
+
+            \chkseal{\small {Suction Canister, Soft Suction (6, 8, 10, 12, 14, 16, 18 fr), Yaunker, Nasal Cannula (Adult (2), Peds (2)), NRB (Adult (2), Peds (2)), Nebulizer(Adult (2), Peds (2)), Epinepherine, Aspirin, Albuterol, Nitroglycerine, Narcan, Oral Glucose, D50/D25}}
+
+            \chkseal{\small {CPAP (1 sm, 1 lg, 1 child), BVMs (Infant (2), Child (2), Adult (2)), OPA Kit, NPAs, Supraglottic Airways, Colormetric CO2 (Adult, Peds)}}
+
+            \chkseal{\small {4x4 (25), Hot/Cold Packs (2ea), Gauze (6), Combi-pads (8), Triangle Bandages (6), Petroleum Gauze (2), Tape (2 in, 1 in), Eye Shields (2), Tourniquets (2), IO Kits 15g, 18g, Triage Tags, Pelvic Sling, Burn Sheet (2), Sterile Water (2L), Pressure Bag, Drip Set (10gtt (3), 60gtt (3)), NS/LR (3L), Angiocath (14g-24g (4)), IV Start Supplies, Syringes (1 3, 10, 60 (2)), Stop Cocks (3), Needles (21g, 25g (2)), MAD}}
+
+            \chkseal{\small {Bedpan/Urinal, Pillows, N95 (2), Impermeable Tape, Gowns (2), Booties (2), Bio Bags, Broslow Tape, Neonate Blanket, OB Kit}}
+        \end{tabularx}
+
+        \begin{tabularx}{\textwidth}{|Xc|Xc|}
+            \hline
+            \chkheader{Safety Devices and Gear}
+            \chkitem{Fire Extinguisher (2)}{Reflective Triangles (3)}
+            \chkitem{Flashlights (2)}{Reflective Safety Vest (2)}
+            \chkitem{Gloves (S,M,L,XL)}{Sharps Container}
+            \chkone{DOT Emergency Response Guide (on tablet)}
+
+            \chkheader{Immobilization Devices}
+            \chkitem{Backboards with straps (2)}{KED (1)}
+            \chkitem{Head Blocks/Immobilizers (2)}{C-Collars (2 Adult, 2 Peds)}
+            \chkitem{Splint Boards (Short and Long)}{Traction Splint (1)}
+
+            \chkheader{Oxygen and Airway}
+            \chkitem{Onboard Oxygen}{Portable Oxygen (2)}
+            \chkitem{Portable Suction (test functioning) + Canister}{Wall Mount Suction Functioning}
+
+            \chkheader{Diagnostic and Assessment }
+            \chkitem{BP Cuff (Adult, Peds, Adult Large)}{Glucometer and Testing Strips}
+            \chkitem{Shears}{Stethoscope}
+            \chkitem{Pulse Ox (Adult and Peds)}{Thermometer}
+            \chkitem{AED: Adult/Peds pads, can power on... OR}{Cardiac Monitor with Adult/Peds therapy pads, electrodes (20), all cables and battery charged (ALS ONLY)}
+
+            \chkheader{BLS Bag/Medications}
+            \chkitem{Epinepherine/Anaphylaxis Kit}{Baby Aspirin}
+            \chkitem{Albuterol}{Nitroglycerine}
+            \chkitem{Naloxone}{Dextrose}
+            \chkone{Oral Glucose}
+        \end{tabularx}
+    \end{center}
+}
+\newenvironment{CTR_ALS}{}{%
+%   \cleardoublepage
+    \begin{center}
+        \begin{tabularx}{\textwidth}{|Xc|Xc|}
+            \hline
+            \chkheader{ALS Airway}
+            \chkitem{Laryngoscope (1 Adult 1 Peds)}{Laryngoscope Blades (Miller 0-4, Mac 2-4)}
+            \chkitem{ETT 2.5-8.5 (2)}{Lubricant (6)}
+            \chkitem{Stylets (1 Adult 1 Peds)}{Magill Foreceps (1 Adult 1 Peds)}
+            \chkitem{ETC02 Waveform Monitoring}{Meconium Aspirator}
+            \chkitem{Decompression Needle (2)}{Bougie}
+            \chkheader{ALS Medications}
+            \chkitem{Adenosine (24mg)}{Atropine (4mg)}
+            \chkitem{Amiodarone (450mg)}{Magnesium Sulfate (2g)}
+            \chkitem{Versed}{Fentanyl}
+            \chkitem{Vasopressor (Epi)}{Sodium Bicarb (100meq)}
+            \chkitem{Ondansetron}{Diphenhydramine}
+        \end{tabularx}
+    \end{center}
+}
+\newenvironment{CTR_VENT}{}{%
+%   \cleardoublepage
+    \begin{center}
+        \begin{tabularx}{\textwidth}{|Xc|Xc|}
+            \hline
+            \chkheader{Ventilator Supplies}
+            \chkitem{Ventilator}{Power Cabling}
+            \chkitem{Ventilator Circuits (2)}{Digital Capnography}
+            \chkone{Oxygen Tubing Appropriate for Vent Model}
+        \end{tabularx}
+    \end{center}
+}
+% INITIALIZATIONS
+
+\CheckTruck{\sffamily{\textbackslash}CheckTruck}
+\CheckDate{\sffamily{\textbackslash}CheckDate}
+
+
+\begin{document}
+
+{{#each checks as |c|}}
+\ {{~c.level~}} Checkoff{ {{~c.name~}} }{ {{~c.date~}} }{ {{~c.level~}} }
+{{/each}}
+
+\end{document}

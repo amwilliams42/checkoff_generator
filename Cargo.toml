@@ -15,8 +15,12 @@ serde_json = "1.0"
 itertools = "0.10.5"
 handlebars = "5.0.0-beta.1"
 tectonic = "0.12.0"
+tectonic_bridge_core = "0.3.1"
+rust-embed = {version = "6.4.2", features=['debug-embed']}
 
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
 
+[features]
+debug-embed = []

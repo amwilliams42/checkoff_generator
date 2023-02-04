@@ -4,4 +4,4 @@ mod generate;
 
 pub use checkoffs::{Checkoffs, TruckCheck};
 pub use form_text::{CheckoffForm};
-pub use generate::generate_checkoffs;
+pub use generate::{generate_checkoffs, RenderQueue, Rcol, create_pdf};
