@@ -24,3 +24,13 @@ features = ["derive"]
 
 [features]
 debug-embed = []
+
+[package.metadata.vcpkg]
+git = "https://github.com/microsoft/vcpkg"
+rev = "47a020d619021539a2533e56ef850696065b23a5"
+
+[package.metadata.vcpkg.target]
+x86_64-apple-darwin = { install = ["freetype","harfbuzz[icu,graphite2]"] }
+aarch64-apple-darwin = { triplet = "arm64-osx", install = ["freetype","harfbuzz[icu,graphite2]"] }
+x86_64-unknown-linux-gnu = { install = ["fontconfig","freetype","harfbuzz[icu,graphite2]"] }
+x86_64-pc-windows-msvc = { triplet = "x64-windows-static-release", install = ["fontconfig","freetype","harfbuzz[icu,graphite2]"] }
